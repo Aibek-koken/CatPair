@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-base: 247 242 234;
+  --color-surface: 255 255 255;
+  --color-ink: 28 26 25;
+  --color-muted: 111 106 99;
+  --color-accent: 14 124 123;
+  --color-accent-2: 242 100 87;
+  --color-accent-3: 246 196 69;
+  --color-border: 231 222 209;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  color: rgb(var(--color-ink));
+  background:
+    radial-gradient(circle at top left, rgba(14, 124, 123, 0.14), transparent 45%),
+    radial-gradient(circle at 80% -20%, rgba(242, 100, 87, 0.18), transparent 45%),
+    linear-gradient(180deg, rgb(247 242 234) 0%, rgb(242 232 219) 100%);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Sora', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

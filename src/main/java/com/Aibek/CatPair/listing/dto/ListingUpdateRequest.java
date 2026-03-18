@@ -1,0 +1,131 @@
+package com.Aibek.CatPair.listing.dto;
+
+import com.Aibek.CatPair.listing.Gender;
+import com.Aibek.CatPair.listing.PriceType;
+import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+
+public class ListingUpdateRequest {
+
+    @Size(max = 100)
+    private String name;
+
+    private Long breedId;
+
+    private Integer age;
+
+    private Gender gender;
+
+    private String color;
+
+    private Double weight;
+
+    @Size(max = 2000)
+    private String description;
+
+    private Long cityId;
+
+    private PriceType priceType;
+
+    private BigDecimal priceValue;
+
+    private Boolean hasDocs;
+
+    private Boolean vaccinated;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getBreedId() {
+        return breedId;
+    }
+
+    public void setBreedId(Long breedId) {
+        this.breedId = breedId;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public Double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
+    }
+
+    public PriceType getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(PriceType priceType) {
+        this.priceType = priceType;
+    }
+
+    public BigDecimal getPriceValue() {
+        return priceValue;
+    }
+
+    public void setPriceValue(BigDecimal priceValue) {
+        this.priceValue = priceValue;
+    }
+
+    public Boolean getHasDocs() {
+        return hasDocs;
+    }
+
+    public void setHasDocs(Boolean hasDocs) {
+        this.hasDocs = hasDocs;
+    }
+
+    public Boolean getVaccinated() {
+        return vaccinated;
+    }
+
+    public void setVaccinated(Boolean vaccinated) {
+        this.vaccinated = vaccinated;
+    }
+}

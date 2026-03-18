@@ -1,0 +1,83 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { fetchChats, fetchMessages, sendMessage } from '../api/chats';
+import ChatList from '../components/ChatList';
+import ChatWindow from '../components/ChatWindow';
+import { getErrorMessage } from '../utils/error';
+
+export default function Chats() {
+  const location = useLocation();
+  const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const initialChatId = query.get('chatId');
+
+  const [chats, setChats] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [messages, setMessages] = useState([]);
+
+  const loadChats = async () => {
+    try {
+      const data = await fetchChats();
+      setChats(data);
+      if (initialChatId) {
+        const found = data.find((chat) => String(chat.id) === String(initialChatId));
+        if (found) {
+          setSelectedChat(found);
+        }
+      }
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Не удалось загрузить чаты'));
+    }
+  };
+
+  const loadMessages = async (chatId) => {
+    try {
+      const data = await fetchMessages(chatId);
+      setMessages(data);
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Не удалось загрузить сообщения'));
+    }
+  };
+
+  useEffect(() => {
+    loadChats();
+  }, []);
+
+  useEffect(() => {
+    if (selectedChat) {
+      loadMessages(selectedChat.id);
+    }
+  }, [selectedChat]);
+
+  const handleSend = async (text) => {
+    if (!selectedChat) return;
+    try {
+      await sendMessage(selectedChat.id, text);
+      loadMessages(selectedChat.id);
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Не удалось отправить сообщение'));
+    }
+  };
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+      <div className="rounded-3xl border border-border bg-white/80 p-5 shadow-soft">
+        <h2 className="text-lg font-semibold">Ваши чаты</h2>
+        <div className="mt-4 max-h-[70vh] overflow-y-auto pr-2 scrollbar-hide">
+          {chats.length === 0 ? (
+            <p className="text-sm text-muted">Чатов пока нет.</p>
+          ) : (
+            <ChatList
+              chats={chats}
+              selectedId={selectedChat?.id}
+              onSelect={(chat) => setSelectedChat(chat)}
+            />
+          )}
+        </div>
+      </div>
+      <div className="h-[70vh] rounded-3xl border border-border bg-white/80 p-6 shadow-soft">
+        <ChatWindow chat={selectedChat} messages={messages} onSend={handleSend} />
+      </div>
+    </div>
+  );
+}
