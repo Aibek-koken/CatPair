@@ -54,9 +54,9 @@ public class ListingController {
                                                     @RequestParam(required = false) Integer age,
                                                     @RequestParam(required = false) ListingStatus status) {
         Long resolvedCityId = resolveCityId(cityId, city);
-        Long resolvedBreedId = resolveBreedId(breedId, breed);
+        String resolvedBreedName = breedId == null ? breed : null;
         Long resolvedParentBreedId = resolveBreedId(parentBreedId, parentBreed);
-        return listingService.getListings(resolvedCityId, resolvedBreedId, resolvedParentBreedId, age, status);
+        return listingService.getListings(resolvedCityId, breedId, resolvedBreedName, resolvedParentBreedId, age, status);
     }
 
     @GetMapping("/{id}")

@@ -14,6 +14,9 @@ public class ListingCreateRequest {
 
     private Long breedId;
 
+    @Size(max = 100)
+    private String breedName;
+
     private Integer age;
 
     private Gender gender;
@@ -49,6 +52,14 @@ public class ListingCreateRequest {
 
     public void setBreedId(Long breedId) {
         this.breedId = breedId;
+    }
+
+    public String getBreedName() {
+        return breedName;
+    }
+
+    public void setBreedName(String breedName) {
+        this.breedName = breedName;
     }
 
     public Integer getAge() {

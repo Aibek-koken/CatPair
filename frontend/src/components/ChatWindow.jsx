@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import Button from './Button';
 import { formatDate } from '../utils/format';
+import { useAuthStore } from '../store/authStore';
 
 export default function ChatWindow({ chat, messages, onSend }) {
   const endRef = useRef(null);
+  const { user } = useAuthStore();
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -25,15 +27,35 @@ export default function ChatWindow({ chat, messages, onSend }) {
       </div>
 
       <div className="flex-1 space-y-3 overflow-y-auto py-4 pr-2 scrollbar-hide">
-        {messages.map((message) => (
-          <div key={message.id} className="rounded-2xl border border-border bg-white/70 p-3">
-            <div className="flex items-center justify-between text-xs text-muted">
-              <span>{message.senderName}</span>
-              <span>{formatDate(message.createdAt)}</span>
+        {messages.map((message) => {
+          const isMine = user && String(message.senderId) === String(user.id);
+          return (
+            <div
+              key={message.id}
+              className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[80%] rounded-2xl border p-3 shadow-sm ${
+                  isMine
+                    ? 'rounded-br-md border-accent/30 bg-accent text-white'
+                    : 'rounded-bl-md border-border bg-white/80 text-ink'
+                }`}
+              >
+                <div
+                  className={`flex items-center justify-between text-xs ${
+                    isMine ? 'text-white/80' : 'text-muted'
+                  }`}
+                >
+                  <span>{message.senderName}</span>
+                  <span>{formatDate(message.createdAt)}</span>
+                </div>
+                <p className={`mt-2 text-sm ${isMine ? 'text-white' : 'text-ink'}`}>
+                  {message.text}
+                </p>
+              </div>
             </div>
-            <p className="mt-2 text-sm text-ink">{message.text}</p>
-          </div>
-        ))}
+          );
+        })}
         <div ref={endRef} />
       </div>
 

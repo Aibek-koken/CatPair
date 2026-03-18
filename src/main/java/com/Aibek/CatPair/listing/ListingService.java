@@ -42,10 +42,12 @@ public class ListingService {
     }
 
     @Transactional(readOnly = true)
-    public List<ListingSummaryResponse> getListings(Long cityId, Long breedId, Long parentBreedId,
-                                                    Integer age, ListingStatus status) {
+    public List<ListingSummaryResponse> getListings(Long cityId, Long breedId, String breedName,
+                                                    Long parentBreedId, Integer age, ListingStatus status) {
+        String resolvedBreedName = breedId == null ? breedName : null;
         Specification<Listing> spec = Specification.where(ListingSpecifications.hasCity(cityId))
                 .and(ListingSpecifications.hasBreed(breedId))
+                .and(ListingSpecifications.hasBreedName(resolvedBreedName))
                 .and(ListingSpecifications.hasParentBreed(parentBreedId))
                 .and(ListingSpecifications.hasAge(age))
                 .and(ListingSpecifications.hasStatus(status));
@@ -94,10 +96,9 @@ public class ListingService {
                     .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "City not found"));
             listing.setCity(city);
         }
-        if (request.getBreedId() != null) {
-            Breed breed = breedRepository.findById(request.getBreedId())
-                    .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Breed not found"));
-            listing.setBreed(breed);
+        Breed resolvedBreed = resolveBreed(request.getBreedId(), request.getBreedName());
+        if (resolvedBreed != null) {
+            listing.setBreed(resolvedBreed);
         }
 
         if (photos != null && photos.length > 0) {
@@ -160,10 +161,9 @@ public class ListingService {
                     .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "City not found"));
             listing.setCity(city);
         }
-        if (request.getBreedId() != null) {
-            Breed breed = breedRepository.findById(request.getBreedId())
-                    .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Breed not found"));
-            listing.setBreed(breed);
+        Breed resolvedBreed = resolveBreed(request.getBreedId(), request.getBreedName());
+        if (resolvedBreed != null) {
+            listing.setBreed(resolvedBreed);
         }
 
         Listing saved = listingRepository.save(listing);
@@ -180,5 +180,22 @@ public class ListingService {
         listing.setStatus(request.getStatus());
         Listing saved = listingRepository.save(listing);
         return ListingMapper.toResponse(saved);
+    }
+
+    private Breed resolveBreed(Long breedId, String breedName) {
+        if (breedId != null) {
+            return breedRepository.findById(breedId)
+                    .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Breed not found"));
+        }
+        if (breedName == null || breedName.isBlank()) {
+            return null;
+        }
+        String normalizedName = breedName.trim();
+        return breedRepository.findByNameIgnoreCase(normalizedName)
+                .orElseGet(() -> {
+                    Breed breed = new Breed();
+                    breed.setName(normalizedName);
+                    return breedRepository.save(breed);
+                });
     }
 }

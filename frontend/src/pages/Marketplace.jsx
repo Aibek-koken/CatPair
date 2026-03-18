@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchListings } from '../api/listings';
-import { fetchBreeds, fetchCities } from '../api/dictionaries';
+import { fetchCities } from '../api/dictionaries';
 import ListingCard from '../components/ListingCard';
 import Loader from '../components/Loader';
 import Button from '../components/Button';
@@ -10,12 +10,10 @@ import { toast } from 'react-toastify';
 export default function Marketplace() {
   const [listings, setListings] = useState([]);
   const [cities, setCities] = useState([]);
-  const [breeds, setBreeds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     cityId: '',
-    breedId: '',
-    parentBreedId: '',
+    breed: '',
     age: '',
   });
 
@@ -34,9 +32,8 @@ export default function Marketplace() {
   useEffect(() => {
     const loadFilters = async () => {
       try {
-        const [citiesData, breedsData] = await Promise.all([fetchCities(), fetchBreeds()]);
+        const citiesData = await fetchCities();
         setCities(citiesData);
-        setBreeds(breedsData);
       } catch (error) {
         toast.error(getErrorMessage(error, 'Не удалось загрузить справочники'));
       }
@@ -52,15 +49,14 @@ export default function Marketplace() {
   const handleApply = () => {
     const params = {
       cityId: filters.cityId || undefined,
-      breedId: filters.breedId || undefined,
-      parentBreedId: filters.parentBreedId || undefined,
+      breed: filters.breed || undefined,
       age: filters.age || undefined,
     };
     loadListings(params);
   };
 
   const handleReset = () => {
-    setFilters({ cityId: '', breedId: '', parentBreedId: '', age: '' });
+    setFilters({ cityId: '', breed: '', age: '' });
     loadListings();
   };
 
@@ -104,36 +100,13 @@ export default function Marketplace() {
 
             <label className="flex flex-col gap-2">
               <span className="font-semibold text-ink">Порода</span>
-              <select
-                name="breedId"
-                value={filters.breedId}
+              <input
+                name="breed"
+                value={filters.breed}
                 onChange={handleChange}
                 className="rounded-2xl border border-border bg-white px-3 py-2"
-              >
-                <option value="">Все породы</option>
-                {breeds.map((breed) => (
-                  <option key={breed.id} value={breed.id}>
-                    {breed.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="flex flex-col gap-2">
-              <span className="font-semibold text-ink">Родительская порода</span>
-              <select
-                name="parentBreedId"
-                value={filters.parentBreedId}
-                onChange={handleChange}
-                className="rounded-2xl border border-border bg-white px-3 py-2"
-              >
-                <option value="">Любая</option>
-                {breeds.map((breed) => (
-                  <option key={breed.id} value={breed.id}>
-                    {breed.name}
-                  </option>
-                ))}
-              </select>
+                placeholder="Например, Британская"
+              />
             </label>
 
             <label className="flex flex-col gap-2">

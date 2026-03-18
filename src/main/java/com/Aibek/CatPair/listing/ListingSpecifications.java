@@ -15,6 +15,14 @@ public final class ListingSpecifications {
         return (root, query, cb) -> breedId == null ? null : cb.equal(root.get("breed").get("id"), breedId);
     }
 
+    public static Specification<Listing> hasBreedName(String breedName) {
+        if (breedName == null || breedName.isBlank()) {
+            return null;
+        }
+        String normalized = breedName.trim().toLowerCase();
+        return (root, query, cb) -> cb.equal(cb.lower(root.get("breed").get("name")), normalized);
+    }
+
     public static Specification<Listing> hasParentBreed(Long parentBreedId) {
         return (root, query, cb) -> parentBreedId == null ? null : cb.equal(root.get("breed").get("parent").get("id"), parentBreedId);
     }

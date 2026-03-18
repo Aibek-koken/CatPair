@@ -7,7 +7,7 @@ import { useAuthStore } from '../store/authStore';
 import { fetchMe, updateMe } from '../api/users';
 import { fetchUserListings, updateListingStatus, createListing } from '../api/listings';
 import { fetchUserPosts } from '../api/posts';
-import { fetchBreeds, fetchCities } from '../api/dictionaries';
+import { fetchCities } from '../api/dictionaries';
 import { getErrorMessage } from '../utils/error';
 import { formatDate, formatPrice } from '../utils/format';
 
@@ -17,25 +17,22 @@ export default function Dashboard() {
   const [listings, setListings] = useState([]);
   const [posts, setPosts] = useState([]);
   const [cities, setCities] = useState([]);
-  const [breeds, setBreeds] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const [me, listingsData, postsData, citiesData, breedsData] = await Promise.all([
+      const [me, listingsData, postsData, citiesData] = await Promise.all([
         fetchMe(),
         fetchUserListings(user.id),
         fetchUserPosts(user.id),
         fetchCities(),
-        fetchBreeds(),
       ]);
       updateUser(me);
       setListings(listingsData);
       setPosts(postsData.content || []);
       setCities(citiesData);
-      setBreeds(breedsData);
     } catch (error) {
       toast.error(getErrorMessage(error, 'Не удалось загрузить профиль'));
     } finally {
@@ -80,7 +77,7 @@ export default function Dashboard() {
     const form = event.currentTarget;
     const data = {
       name: form.name.value.trim(),
-      breedId: form.breedId.value ? Number(form.breedId.value) : null,
+      breedName: form.breedName.value.trim() || null,
       age: form.age.value ? Number(form.age.value) : null,
       gender: form.gender.value || null,
       color: form.color.value.trim() || null,
@@ -236,17 +233,7 @@ export default function Dashboard() {
                 ))}
               </select>
             </label>
-            <label className="flex flex-col gap-2 text-sm">
-              <span className="font-semibold text-ink">Порода</span>
-              <select name="breedId" className="rounded-2xl border border-border bg-white px-3 py-2">
-                <option value="">Выберите породу</option>
-                {breeds.map((breed) => (
-                  <option key={breed.id} value={breed.id}>
-                    {breed.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <Input name="breedName" label="Порода" placeholder="Введите породу" />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <Input name="age" label="Возраст" type="number" min="0" />
