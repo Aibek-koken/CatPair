@@ -1,5 +1,6 @@
 package com.Aibek.CatPair.listing;
 
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 public final class ListingSpecifications {
@@ -33,5 +34,23 @@ public final class ListingSpecifications {
 
     public static Specification<Listing> hasStatus(ListingStatus status) {
         return (root, query, cb) -> status == null ? null : cb.equal(root.get("status"), status);
+    }
+
+    public static Specification<Listing> matchesQuery(String queryText) {
+        if (queryText == null || queryText.isBlank()) {
+            return null;
+        }
+        String pattern = "%" + queryText.trim().toLowerCase() + "%";
+        return (root, criteriaQuery, cb) -> {
+            criteriaQuery.distinct(true);
+            var breedJoin = root.join("breed", JoinType.LEFT);
+            var cityJoin = root.join("city", JoinType.LEFT);
+            return cb.or(
+                    cb.like(cb.lower(root.get("name")), pattern),
+                    cb.like(cb.lower(root.get("description")), pattern),
+                    cb.like(cb.lower(breedJoin.get("name")), pattern),
+                    cb.like(cb.lower(cityJoin.get("name")), pattern)
+            );
+        };
     }
 }

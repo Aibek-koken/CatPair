@@ -128,7 +128,7 @@ export default function Dashboard() {
           ) : (
             <form className="mt-4 space-y-4" onSubmit={handleProfileUpdate}>
               <Input name="name" label="Имя" defaultValue={user?.name || ''} />
-              <Input name="avatarUrl" label="Avatar URL" defaultValue={user?.avatarUrl || ''} />
+              <Input name="avatarUrl" label="Ссылка на аватар" defaultValue={user?.avatarUrl || ''} />
               <Input name="contactInfo" label="Контакты" defaultValue={user?.contactInfo || ''} />
               <Button type="submit">Сохранить</Button>
             </form>
@@ -175,7 +175,7 @@ export default function Dashboard() {
                       <span className={`rounded-full px-2 py-1 text-xs font-semibold ${
                         listing.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'
                       }`}>
-                        {listing.status === 'ACTIVE' ? 'Active' : 'Inactive'}
+                        {listing.status === 'ACTIVE' ? 'Активно' : 'Неактивно'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs text-muted">

@@ -15,6 +15,7 @@ export default function Marketplace() {
     cityId: '',
     breed: '',
     age: '',
+    query: '',
   });
 
   const loadListings = async (params = {}) => {
@@ -51,12 +52,13 @@ export default function Marketplace() {
       cityId: filters.cityId || undefined,
       breed: filters.breed || undefined,
       age: filters.age || undefined,
+      query: filters.query || undefined,
     };
     loadListings(params);
   };
 
   const handleReset = () => {
-    setFilters({ cityId: '', breed: '', age: '' });
+    setFilters({ cityId: '', breed: '', age: '', query: '' });
     loadListings();
   };
 
@@ -65,10 +67,9 @@ export default function Marketplace() {
       <section className="rounded-3xl border border-border bg-white/70 p-8 shadow-soft">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-muted">Marketplace</p>
             <h1 className="text-3xl font-semibold">Каталог анкет</h1>
             <p className="mt-2 text-sm text-muted">
-              Фильтруйте по городу, породе и возрасту, чтобы найти идеальную пару.
+              Ищите по имени, породе или городу и уточняйте фильтрами.
             </p>
           </div>
           <div className="rounded-2xl bg-accent/10 px-4 py-3 text-sm text-accent">
@@ -81,6 +82,16 @@ export default function Marketplace() {
         <div className="rounded-3xl border border-border bg-white/80 p-6 shadow-soft">
           <h2 className="text-lg font-semibold">Фильтры</h2>
           <div className="mt-4 space-y-4 text-sm">
+            <label className="flex flex-col gap-2">
+              <span className="font-semibold text-ink">Поиск</span>
+              <input
+                name="query"
+                value={filters.query}
+                onChange={handleChange}
+                className="rounded-2xl border border-border bg-white px-3 py-2"
+                placeholder="Имя, порода или город"
+              />
+            </label>
             <label className="flex flex-col gap-2">
               <span className="font-semibold text-ink">Город</span>
               <select

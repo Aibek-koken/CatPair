@@ -38,16 +38,16 @@ export default function Register() {
     <div className="grid gap-8 md:grid-cols-[1fr_1.2fr]">
       <div className="hidden flex-col justify-between rounded-3xl border border-border bg-gradient-to-br from-accent2/10 via-white to-accent/10 p-8 md:flex">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-muted">CatPair Start</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-muted">Старт CatPair</p>
           <h2 className="mt-3 text-2xl font-semibold">Создайте профиль за минуту</h2>
           <p className="mt-4 text-sm text-muted">
-            Получите доступ к объявлениям, чату и комьюнити.
+            Получите доступ к объявлениям, чату и сообществу.
           </p>
         </div>
         <div className="rounded-3xl bg-white/80 p-5 shadow-soft">
           <p className="text-sm font-semibold">Подсказка</p>
           <p className="mt-2 text-sm text-muted">
-            Используйте актуальный email, чтобы не пропускать сообщения.
+            Используйте актуальную эл. почту, чтобы не пропускать сообщения.
           </p>
         </div>
       </div>
@@ -56,7 +56,7 @@ export default function Register() {
         <p className="mt-3 text-sm text-muted">Начните подбор пары уже сегодня.</p>
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <Input name="name" label="Имя" placeholder="Айбек" required />
-          <Input name="email" type="email" label="Email" placeholder="you@example.com" required />
+          <Input name="email" type="email" label="Эл. почта" placeholder="почта@catpair.kz" required />
           <Input name="password" type="password" label="Пароль" placeholder="Минимум 6 символов" required />
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Создаем...' : 'Создать аккаунт'}

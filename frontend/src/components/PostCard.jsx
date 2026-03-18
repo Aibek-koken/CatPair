@@ -10,7 +10,7 @@ export default function PostCard({ post }) {
       <p className="mt-3 text-sm leading-relaxed text-ink">{post.text}</p>
       {post.imageUrl && (
         <div className="mt-4 overflow-hidden rounded-2xl border border-border">
-          <img src={post.imageUrl} alt="post" className="h-64 w-full object-cover" />
+          <img src={post.imageUrl} alt="Пост" className="h-64 w-full object-cover" />
         </div>
       )}
     </article>

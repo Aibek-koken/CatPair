@@ -43,13 +43,14 @@ public class ListingService {
 
     @Transactional(readOnly = true)
     public List<ListingSummaryResponse> getListings(Long cityId, Long breedId, String breedName,
-                                                    Long parentBreedId, Integer age, ListingStatus status) {
+                                                    Long parentBreedId, Integer age, String query, ListingStatus status) {
         String resolvedBreedName = breedId == null ? breedName : null;
         Specification<Listing> spec = Specification.where(ListingSpecifications.hasCity(cityId))
                 .and(ListingSpecifications.hasBreed(breedId))
                 .and(ListingSpecifications.hasBreedName(resolvedBreedName))
                 .and(ListingSpecifications.hasParentBreed(parentBreedId))
                 .and(ListingSpecifications.hasAge(age))
+                .and(ListingSpecifications.matchesQuery(query))
                 .and(ListingSpecifications.hasStatus(status));
         List<Listing> listings = listingRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt"));
         List<ListingSummaryResponse> response = new ArrayList<>();

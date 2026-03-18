@@ -53,6 +53,8 @@ export default function ListingDetail() {
   const photos = listing.photoUrls || [];
   const activePhoto = photos[currentPhoto];
   const imageUrl = activePhoto ? `${API_URL}${activePhoto}` : null;
+  const statusLabel = listing.status === 'ACTIVE' ? 'Активно' : 'Неактивно';
+  const genderLabel = listing.gender === 'MALE' ? 'Самец' : listing.gender === 'FEMALE' ? 'Самка' : 'Не указан';
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -77,7 +79,7 @@ export default function ListingDetail() {
                     currentPhoto === index ? 'border-accent' : 'border-border'
                   }`}
                 >
-                  <img src={`${API_URL}${photo}`} alt="thumbnail" className="h-full w-full object-cover" />
+                  <img src={`${API_URL}${photo}`} alt="Миниатюра" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>
@@ -100,7 +102,7 @@ export default function ListingDetail() {
             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
               listing.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'
             }`}>
-              {listing.status === 'ACTIVE' ? 'Active' : 'Inactive'}
+              {statusLabel}
             </span>
           </div>
           <div className="mt-6 grid gap-4 text-sm">
@@ -114,7 +116,7 @@ export default function ListingDetail() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted">Пол</span>
-              <span className="font-semibold">{listing.gender || 'Не указан'}</span>
+              <span className="font-semibold">{genderLabel}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted">Вес</span>

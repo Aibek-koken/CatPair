@@ -26,11 +26,11 @@ export default function ListingCard({ listing }) {
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold">{listing.name}</h3>
+          <h3 className="text-base font-semibold text-ink">{listing.name}</h3>
           <span className={`rounded-full px-2 py-1 text-xs font-semibold ${
             listing.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'
           }`}>
-            {listing.status === 'ACTIVE' ? 'Active' : 'Inactive'}
+            {listing.status === 'ACTIVE' ? 'Активно' : 'Неактивно'}
           </span>
         </div>
         <p className="text-sm text-muted">

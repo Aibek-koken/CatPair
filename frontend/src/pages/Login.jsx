@@ -41,7 +41,7 @@ export default function Login() {
           Войдите, чтобы управлять объявлениями, писать в чаты и делиться новостями.
         </p>
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <Input name="email" type="email" label="Email" placeholder="you@example.com" required />
+          <Input name="email" type="email" label="Эл. почта" placeholder="почта@catpair.kz" required />
           <Input name="password" type="password" label="Пароль" placeholder="••••••" required />
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Входим...' : 'Войти'}
@@ -56,7 +56,7 @@ export default function Login() {
       </div>
       <div className="hidden flex-col justify-between rounded-3xl border border-border bg-gradient-to-br from-accent/10 via-white to-accent2/10 p-8 md:flex">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-muted">CatPair Insight</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-muted">Заметка CatPair</p>
           <h2 className="mt-3 text-2xl font-semibold">Найди идеальную пару для кошки</h2>
           <p className="mt-4 text-sm text-muted">
             Собранные анкеты, честные описания и быстрый доступ к владельцам.
