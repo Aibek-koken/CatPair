@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
+import javax.crypto.SecretKey; // ИЗМЕНЕНО: используем SecretKey
 import java.time.Instant;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
-    private final Key key;
+    // ИЗМЕНЕНО: Тип поля теперь SecretKey вместо Key
+    private final SecretKey key;
     private final long expirationMinutes;
 
     public JwtService(@Value("${app.jwt.secret}") String secret,
                       @Value("${app.jwt.expiration-minutes}") long expirationMinutes) {
+        // Keys.hmacShaKeyFor возвращает SecretKey, так что здесь всё будет работать
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMinutes = expirationMinutes;
     }
@@ -30,7 +32,7 @@ public class JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
-                .signWith(key)
+                .signWith(key) // Теперь сюда передается SecretKey
                 .compact();
     }
 
@@ -50,10 +52,9 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(key) // Теперь типы совпадают (SecretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
 }
