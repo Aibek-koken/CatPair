@@ -1,0 +1,15 @@
+target
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+.DS_Store
+
+frontend
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+uploads
