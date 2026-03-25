@@ -9,6 +9,9 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+        // Disable proxy timeout so long-lived SSE connections are not closed
+        timeout: 0,
+        proxyTimeout: 0,
       },
       '/uploads': {
         target: 'http://localhost:8080',

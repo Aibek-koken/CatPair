@@ -29,13 +29,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        // Primary: Authorization header (all regular API calls)
+        // Fallback: ?token= query param (needed for EventSource / SSE subscriptions,
+        //           because the browser EventSource API cannot set custom headers)
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String tokenParam = request.getParameter("token");
+
+        String jwt = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+        } else if (tokenParam != null && !tokenParam.isBlank()) {
+            jwt = tokenParam;
+        }
+
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        String jwt = authHeader.substring(7);
         String username;
         try {
             username = jwtService.extractUsername(jwt);

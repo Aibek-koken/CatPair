@@ -15,16 +15,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ChatService {
 
+    private static final String EVENT_NEW_MESSAGE = "NEW_MESSAGE";
+
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
     private final ListingRepository listingRepository;
+    private final SseEmitterRegistry sseRegistry;
 
     public ChatService(ChatRepository chatRepository,
                        MessageRepository messageRepository,
-                       ListingRepository listingRepository) {
+                       ListingRepository listingRepository,
+                       SseEmitterRegistry sseRegistry) {
         this.chatRepository = chatRepository;
         this.messageRepository = messageRepository;
         this.listingRepository = listingRepository;
+        this.sseRegistry = sseRegistry;
     }
 
     @Transactional
@@ -84,7 +89,14 @@ public class ChatService {
         message.setSender(currentUser);
         message.setText(text.trim());
         Message saved = messageRepository.save(message);
-        return MessageMapper.toResponse(saved);
+        MessageResponse response = MessageMapper.toResponse(saved);
+
+        // Push the new message to both participants via SSE.
+        // The sender's frontend deduplicates by message ID so no double display occurs.
+        sseRegistry.sendToUser(chat.getInitiator().getId(), EVENT_NEW_MESSAGE, response);
+        sseRegistry.sendToUser(chat.getOwner().getId(), EVENT_NEW_MESSAGE, response);
+
+        return response;
     }
 
     private Chat getChatForUser(User currentUser, Long chatId) {
