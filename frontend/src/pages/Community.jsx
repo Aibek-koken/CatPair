@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { createPost, fetchFeed } from '../api/posts';
@@ -71,6 +72,22 @@ export default function Community() {
 
   useEffect(() => {
     setCommentDraft('');
+  }, [commentPanelPostId]);
+
+  // Lock body scroll and prevent layout shift when the comment drawer is open
+  useEffect(() => {
+    if (commentPanelPostId) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
   }, [commentPanelPostId]);
 
   const updateInteraction = (postId, updater) => {
@@ -405,92 +422,107 @@ export default function Community() {
         </>
       )}
 
-      {commentPanelPostId && (
-        <div className="fixed inset-0 z-50">
-          <div
-            className="absolute inset-0 bg-black/25"
-            role="button"
-            tabIndex={0}
-            onClick={handleCloseComments}
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') handleCloseComments();
-            }}
-          />
-          <aside className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-border bg-white p-6 shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold">Комментарии</h2>
-                {activeCommentPost && (
-                  <p className="mt-1 text-xs text-muted">
-                    {activeCommentPost.userName || 'Пользователь'} ·{' '}
-                    {formatDate(activeCommentPost.createdAt)}
-                  </p>
+      {commentPanelPostId &&
+        createPortal(
+          /* Rendered at document.body to escape all stacking contexts */
+          <div className="fixed inset-0 z-[9999] flex">
+            {/* Full-viewport backdrop */}
+            <div
+              className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+              role="button"
+              aria-label="Закрыть комментарии"
+              tabIndex={0}
+              onClick={handleCloseComments}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') handleCloseComments();
+              }}
+            />
+
+            {/* Drawer panel */}
+            <aside className="relative ml-auto flex h-full w-full max-w-md flex-col border-l border-border bg-white shadow-2xl">
+              {/* Drawer header */}
+              <div className="flex shrink-0 items-start justify-between gap-4 border-b border-border px-6 py-5">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">Комментарии</h2>
+                  {activeCommentPost && (
+                    <p className="mt-0.5 text-xs text-muted">
+                      {activeCommentPost.userName || 'Пользователь'} ·{' '}
+                      {formatDate(activeCommentPost.createdAt)}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCloseComments}
+                  className="mt-0.5 rounded-full border border-border px-3 py-1 text-xs font-semibold text-muted transition hover:bg-black/5"
+                >
+                  Закрыть
+                </button>
+              </div>
+
+              {/* Original post preview */}
+              {activeCommentPost && (
+                <div className="mx-6 mt-4 shrink-0 rounded-2xl border border-border bg-base/40 p-4 text-sm text-ink leading-relaxed">
+                  {activeCommentPost.text}
+                </div>
+              )}
+
+              {/* Comment list */}
+              <div className="mt-4 flex-1 space-y-3 overflow-y-auto px-6 pb-2">
+                {activeComments.length === 0 ? (
+                  <p className="text-sm text-muted">Пока нет комментариев.</p>
+                ) : (
+                  activeComments.map((item) => (
+                    <div key={item.id} className="rounded-2xl border border-border bg-white/80 p-3">
+                      <div className="flex items-center justify-between text-[11px] text-muted">
+                        <span className="font-semibold text-ink/70">{item.author || 'Гость'}</span>
+                        <span>{formatDate(item.createdAt)}</span>
+                      </div>
+                      <p className="mt-1.5 text-sm text-ink">{item.text}</p>
+                    </div>
+                  ))
                 )}
               </div>
-              <button
-                type="button"
-                onClick={handleCloseComments}
-                className="rounded-full border border-border px-3 py-1 text-xs font-semibold text-muted transition hover:bg-black/5"
-              >
-                Закрыть
-              </button>
-            </div>
 
-            {activeCommentPost && (
-              <div className="mt-4 rounded-2xl border border-border bg-white/70 p-4 text-sm text-ink">
-                {activeCommentPost.text}
-              </div>
-            )}
-
-            <div className="mt-4 flex-1 space-y-3 overflow-y-auto pr-1">
-              {activeComments.length === 0 ? (
-                <p className="text-sm text-muted">Пока нет комментариев.</p>
-              ) : (
-                activeComments.map((item) => (
-                  <div key={item.id} className="rounded-2xl border border-border bg-white/80 p-3">
-                    <div className="flex items-center justify-between text-[11px] text-muted">
-                      <span>{item.author || 'Пользователь'}</span>
-                      <span>{formatDate(item.createdAt)}</span>
+              {/* Comment form / login prompt */}
+              <div className="shrink-0 border-t border-border px-6 py-4">
+                {token ? (
+                  <form onSubmit={handleCommentSubmit} className="space-y-3">
+                    <textarea
+                      rows="3"
+                      value={commentDraft}
+                      onChange={(event) => setCommentDraft(event.target.value)}
+                      placeholder="Напишите комментарий…"
+                      className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm focus:border-accent focus:outline-none"
+                    />
+                    <Button type="submit">Отправить</Button>
+                  </form>
+                ) : (
+                  <div className="rounded-2xl border border-border bg-base/40 p-4 text-sm text-muted">
+                    <p>Войдите или зарегистрируйтесь, чтобы оставлять комментарии.</p>
+                    <div className="mt-3 flex flex-wrap gap-3">
+                      <Link
+                        to="/login"
+                        className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0b6665]"
+                        onClick={handleCloseComments}
+                      >
+                        Войти
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="rounded-full border border-accent px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/10"
+                        onClick={handleCloseComments}
+                      >
+                        Регистрация
+                      </Link>
                     </div>
-                    <p className="mt-2 text-sm text-ink">{item.text}</p>
                   </div>
-                ))
-              )}
-            </div>
-
-            {token ? (
-              <form onSubmit={handleCommentSubmit} className="mt-4 space-y-3">
-                <textarea
-                  rows="3"
-                  value={commentDraft}
-                  onChange={(event) => setCommentDraft(event.target.value)}
-                  placeholder="Напишите комментарий"
-                  className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm focus:border-accent focus:outline-none"
-                />
-                <Button type="submit">Отправить</Button>
-              </form>
-            ) : (
-              <div className="mt-4 rounded-2xl border border-border bg-white/70 p-4 text-sm text-muted">
-                <p>Войдите или зарегистрируйтесь, чтобы оставлять комментарии.</p>
-                <div className="mt-3 flex flex-wrap gap-3">
-                  <Link
-                    to="/login"
-                    className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#0b6665]"
-                  >
-                    Войти
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="rounded-full border border-accent px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/10"
-                  >
-                    Регистрация
-                  </Link>
-                </div>
+                )}
               </div>
-            )}
-          </aside>
-        </div>
-      )}
+            </aside>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

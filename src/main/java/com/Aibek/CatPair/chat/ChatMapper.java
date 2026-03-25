@@ -13,7 +13,9 @@ public final class ChatMapper {
         response.setListingId(chat.getListing().getId());
         response.setListingName(chat.getListing().getName());
         response.setInitiatorId(chat.getInitiator().getId());
+        response.setInitiatorName(chat.getInitiator().getName());
         response.setOwnerId(chat.getOwner().getId());
+        response.setOwnerName(chat.getOwner().getName());
         response.setCreatedAt(chat.getCreatedAt());
         return response;
     }

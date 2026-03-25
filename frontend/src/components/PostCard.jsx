@@ -2,6 +2,49 @@ import { formatDate } from '../utils/format';
 
 const iconBase = 'h-4 w-4';
 
+const AVATAR_PALETTES = [
+  'bg-accent/15 text-accent',
+  'bg-accent2/15 text-accent2',
+  'bg-accent3/30 text-ink',
+  'bg-purple-100 text-purple-700',
+  'bg-sky-100 text-sky-700',
+];
+
+function AuthorAvatar({ name }) {
+  const letter = (name || 'П')[0].toUpperCase();
+  const palette = AVATAR_PALETTES[letter.charCodeAt(0) % AVATAR_PALETTES.length];
+  return (
+    <span
+      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold ${palette}`}
+      aria-hidden="true"
+    >
+      {letter}
+    </span>
+  );
+}
+
+function CatMeta({ breed, age, health, vaccinated }) {
+  const items = [
+    breed && { label: 'Порода', value: breed },
+    age != null && { label: 'Возраст', value: `${age} лет` },
+    health && { label: 'Здоровье', value: health },
+    vaccinated != null && { label: 'Вакцина', value: vaccinated ? 'Есть' : 'Нет' },
+  ].filter(Boolean);
+
+  if (items.length === 0) return null;
+
+  return (
+    <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 rounded-2xl border border-border bg-base/40 px-3 py-2">
+      {items.map(({ label, value }) => (
+        <div key={label} className="flex items-center gap-1 text-[11px]">
+          <dt className="font-semibold text-muted">{label}:</dt>
+          <dd className="text-ink">{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function LikeIcon() {
   return (
     <svg className={iconBase} viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -85,19 +128,52 @@ export default function PostCard({
   };
 
   return (
-    <article className="rounded-3xl border border-border bg-white/80 p-5 shadow-soft">
-      <div className="flex items-center justify-between text-xs text-muted">
-        <span>{post.userName || 'Пользователь'}</span>
-        <span>{formatDate(post.createdAt)}</span>
-      </div>
-      <p className="mt-3 text-sm leading-relaxed text-ink">{post.text}</p>
-      {post.imageUrl && (
-        <div className="mt-4 overflow-hidden rounded-2xl border border-border">
-          <img src={post.imageUrl} alt="Пост" className="h-64 w-full object-cover" />
+    <article className="flex flex-col gap-0 overflow-hidden rounded-3xl border border-border bg-white/80 shadow-soft">
+      {/* Author header */}
+      <div className="flex items-center justify-between gap-3 px-5 pt-5">
+        <div className="flex items-center gap-2.5">
+          <AuthorAvatar name={post.userName} />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-ink leading-tight">
+              {post.userName || 'Пользователь'}
+            </p>
+            <p className="text-[11px] text-muted leading-tight">Автор публикации</p>
+          </div>
         </div>
-      )}
+        <time className="shrink-0 rounded-full bg-base/60 px-2.5 py-1 text-[11px] font-medium text-muted">
+          {formatDate(post.createdAt)}
+        </time>
+      </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+      {/* Body */}
+      <div className="px-5 pt-3">
+        <p className="text-sm leading-relaxed text-ink">{post.text}</p>
+
+        {/* Optional structured cat metadata */}
+        <CatMeta
+          breed={post.breed ?? post.breedName ?? null}
+          age={post.age ?? null}
+          health={post.health ?? post.healthStatus ?? null}
+          vaccinated={post.vaccinated ?? null}
+        />
+
+        {post.imageUrl && (
+          <div className="mt-4 overflow-hidden rounded-2xl border border-border">
+            <img
+              src={post.imageUrl}
+              alt="Пост"
+              className="h-64 w-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Divider */}
+      <div className="mx-5 mt-4 border-t border-border" />
+
+      {/* Actions */}
+      <div className="flex flex-wrap items-center gap-2 px-5 py-3 text-xs">
         <button
           type="button"
           onClick={() => guardAction(() => onReact?.(post.id, 'like'))}
@@ -113,6 +189,7 @@ export default function PostCard({
           <LikeIcon />
           <span>{likes}</span>
         </button>
+
         <button
           type="button"
           onClick={() => guardAction(() => onReact?.(post.id, 'dislike'))}
@@ -128,6 +205,7 @@ export default function PostCard({
           <DislikeIcon />
           <span>{dislikes}</span>
         </button>
+
         <button
           type="button"
           onClick={() => onOpenComments?.(post.id)}
@@ -137,6 +215,7 @@ export default function PostCard({
           <CommentIcon />
           <span>{comments.length}</span>
         </button>
+
         <button
           type="button"
           onClick={() => guardAction(() => onToggleSaved?.(post.id))}

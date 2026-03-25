@@ -8,8 +8,12 @@ public class ChatResponse {
     private Long listingId;
     private String listingName;
     private Long initiatorId;
+    private String initiatorName;
     private Long ownerId;
+    private String ownerName;
     private Instant createdAt;
+    private Instant lastMessageAt;
+    private String lastMessageText;
 
     public Long getId() {
         return id;
@@ -43,6 +47,14 @@ public class ChatResponse {
         this.initiatorId = initiatorId;
     }
 
+    public String getInitiatorName() {
+        return initiatorName;
+    }
+
+    public void setInitiatorName(String initiatorName) {
+        this.initiatorName = initiatorName;
+    }
+
     public Long getOwnerId() {
         return ownerId;
     }
@@ -51,11 +63,35 @@ public class ChatResponse {
         this.ownerId = ownerId;
     }
 
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Instant getLastMessageAt() {
+        return lastMessageAt;
+    }
+
+    public void setLastMessageAt(Instant lastMessageAt) {
+        this.lastMessageAt = lastMessageAt;
+    }
+
+    public String getLastMessageText() {
+        return lastMessageText;
+    }
+
+    public void setLastMessageText(String lastMessageText) {
+        this.lastMessageText = lastMessageText;
     }
 }

@@ -54,7 +54,13 @@ public class ChatService {
         );
         List<ChatResponse> response = new ArrayList<>();
         for (Chat chat : chats) {
-            response.add(ChatMapper.toResponse(chat));
+            ChatResponse cr = ChatMapper.toResponse(chat);
+            messageRepository.findTopByChatIdOrderByCreatedAtDesc(chat.getId())
+                    .ifPresent(m -> {
+                        cr.setLastMessageAt(m.getCreatedAt());
+                        cr.setLastMessageText(m.getText());
+                    });
+            response.add(cr);
         }
         return response;
     }
