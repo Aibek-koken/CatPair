@@ -54,11 +54,6 @@ export default function ChatList({ chats, selectedId, unreadIds = new Set(), cur
                 )}
               </div>
 
-              {/* Listing name */}
-              <p className="mt-0.5 truncate text-[11px] text-muted">
-                {chat.listingName}
-              </p>
-
               {/* Last message preview */}
               {chat.lastMessageText ? (
                 <p

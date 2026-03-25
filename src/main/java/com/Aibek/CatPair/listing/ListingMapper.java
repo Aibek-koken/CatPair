@@ -17,6 +17,8 @@ public final class ListingMapper {
         response.setId(listing.getId());
         response.setOwnerId(listing.getOwner().getId());
         response.setOwnerName(listing.getOwner().getName());
+        response.setOwnerAvatarUrl(listing.getOwner().getAvatarUrl());
+        response.setOwnerCreatedAt(listing.getOwner().getCreatedAt());
         response.setName(listing.getName());
         mapBreedAndCity(response, listing.getBreed(), listing.getCity());
         response.setAge(listing.getAge());
@@ -50,8 +52,14 @@ public final class ListingMapper {
         }
         response.setAge(listing.getAge());
         response.setGender(listing.getGender());
+        response.setDescription(listing.getDescription());
         response.setPriceType(listing.getPriceType());
         response.setPriceValue(listing.getPriceValue());
+        response.setHasDocs(listing.isHasDocs());
+        response.setVaccinated(listing.isVaccinated());
+        if (listing.getOwner() != null) {
+            response.setOwnerName(listing.getOwner().getName());
+        }
         response.setStatus(listing.getStatus());
         response.setCreatedAt(listing.getCreatedAt());
         response.setPhotoUrls(mapPhotoUrls(listing));

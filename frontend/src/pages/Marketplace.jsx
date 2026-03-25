@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { fetchListings } from '../api/listings';
-import { fetchCities } from '../api/dictionaries';
+import { fetchCities, fetchBreeds } from '../api/dictionaries';
 import ListingCard from '../components/ListingCard';
+import BreedSelect, { OTHER_VALUE } from '../components/BreedSelect';
 import Loader from '../components/Loader';
 import Button from '../components/Button';
 import { getErrorMessage } from '../utils/error';
@@ -10,10 +11,12 @@ import { toast } from 'react-toastify';
 export default function Marketplace() {
   const [listings, setListings] = useState([]);
   const [cities, setCities] = useState([]);
+  const [breeds, setBreeds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     cityId: '',
-    breed: '',
+    breedValue: '',
+    customBreed: '',
     age: '',
     query: '',
   });
@@ -33,8 +36,9 @@ export default function Marketplace() {
   useEffect(() => {
     const loadFilters = async () => {
       try {
-        const citiesData = await fetchCities();
+        const [citiesData, breedsData] = await Promise.all([fetchCities(), fetchBreeds()]);
         setCities(citiesData);
+        setBreeds(breedsData);
       } catch (error) {
         toast.error(getErrorMessage(error, 'Не удалось загрузить справочники'));
       }
@@ -50,15 +54,19 @@ export default function Marketplace() {
   const handleApply = () => {
     const params = {
       cityId: filters.cityId || undefined,
-      breed: filters.breed || undefined,
       age: filters.age || undefined,
       query: filters.query || undefined,
     };
+    if (filters.breedValue === OTHER_VALUE) {
+      params.breed = filters.customBreed.trim() || undefined;
+    } else if (filters.breedValue) {
+      params.breedId = filters.breedValue;
+    }
     loadListings(params);
   };
 
   const handleReset = () => {
-    setFilters({ cityId: '', breed: '', age: '', query: '' });
+    setFilters({ cityId: '', breedValue: '', customBreed: '', age: '', query: '' });
     loadListings();
   };
 
@@ -109,16 +117,16 @@ export default function Marketplace() {
               </select>
             </label>
 
-            <label className="flex flex-col gap-2">
-              <span className="font-semibold text-ink">Порода</span>
-              <input
-                name="breed"
-                value={filters.breed}
-                onChange={handleChange}
-                className="rounded-2xl border border-border bg-white px-3 py-2"
-                placeholder="Например, Британская"
-              />
-            </label>
+            <BreedSelect
+              label="Порода"
+              breeds={breeds}
+              value={filters.breedValue}
+              customValue={filters.customBreed}
+              onChange={(val) => setFilters((prev) => ({ ...prev, breedValue: val }))}
+              onCustomChange={(text) => setFilters((prev) => ({ ...prev, customBreed: text }))}
+              placeholder="Поиск породы…"
+              allowEmpty
+            />
 
             <label className="flex flex-col gap-2">
               <span className="font-semibold text-ink">Возраст</span>

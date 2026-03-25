@@ -3,11 +3,12 @@ import { toast } from 'react-toastify';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Modal from '../components/Modal';
+import BreedSelect, { OTHER_VALUE } from '../components/BreedSelect';
 import { useAuthStore } from '../store/authStore';
 import { fetchMe, updateMe } from '../api/users';
 import { fetchUserListings, updateListingStatus, createListing } from '../api/listings';
 import { fetchUserPosts } from '../api/posts';
-import { fetchCities } from '../api/dictionaries';
+import { fetchCities, fetchBreeds } from '../api/dictionaries';
 import { getErrorMessage } from '../utils/error';
 import { formatDate, formatPrice } from '../utils/format';
 
@@ -17,22 +18,29 @@ export default function Dashboard() {
   const [listings, setListings] = useState([]);
   const [posts, setPosts] = useState([]);
   const [cities, setCities] = useState([]);
+  const [breeds, setBreeds] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const [breedValue, setBreedValue] = useState('');
+  const [customBreed, setCustomBreed] = useState('');
+
   const loadData = async () => {
+    if (!user) return;
     setLoading(true);
     try {
-      const [me, listingsData, postsData, citiesData] = await Promise.all([
+      const [me, listingsData, postsData, citiesData, breedsData] = await Promise.all([
         fetchMe(),
         fetchUserListings(user.id),
         fetchUserPosts(user.id),
         fetchCities(),
+        fetchBreeds(),
       ]);
       updateUser(me);
       setListings(listingsData);
       setPosts(postsData.content || []);
       setCities(citiesData);
+      setBreeds(breedsData);
     } catch (error) {
       toast.error(getErrorMessage(error, 'Не удалось загрузить профиль'));
     } finally {
@@ -75,9 +83,9 @@ export default function Dashboard() {
   const handleCreateListing = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
+
     const data = {
       name: form.name.value.trim(),
-      breedName: form.breedName.value.trim() || null,
       age: form.age.value ? Number(form.age.value) : null,
       gender: form.gender.value || null,
       color: form.color.value.trim() || null,
@@ -90,6 +98,12 @@ export default function Dashboard() {
       vaccinated: form.vaccinated.checked,
     };
 
+    if (breedValue === OTHER_VALUE) {
+      data.breedName = customBreed.trim() || null;
+    } else if (breedValue) {
+      data.breedId = Number(breedValue);
+    }
+
     const formData = new FormData();
     formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
     const files = form.photos.files;
@@ -101,6 +115,8 @@ export default function Dashboard() {
       await createListing(formData);
       toast.success('Объявление создано');
       setOpenModal(false);
+      setBreedValue('');
+      setCustomBreed('');
       form.reset();
       loadData();
     } catch (error) {
@@ -233,7 +249,15 @@ export default function Dashboard() {
                 ))}
               </select>
             </label>
-            <Input name="breedName" label="Порода" placeholder="Введите породу" />
+            <BreedSelect
+              label="Порода"
+              breeds={breeds}
+              value={breedValue}
+              customValue={customBreed}
+              onChange={setBreedValue}
+              onCustomChange={setCustomBreed}
+              placeholder="Выберите породу"
+            />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <Input name="age" label="Возраст" type="number" min="0" />

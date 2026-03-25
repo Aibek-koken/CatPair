@@ -2,7 +2,6 @@ package com.Aibek.CatPair.chat;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -25,9 +24,7 @@ public class SseEmitterRegistry {
      * Automatically removes itself on completion, timeout, or error.
      */
     public SseEmitter subscribe(Long userId) {
-        // Long.MAX_VALUE disables the built-in timeout;
-        // the client's EventSource is responsible for reconnecting.
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L);
 
         registry.computeIfAbsent(userId, k -> new CopyOnWriteArrayList<>()).add(emitter);
 

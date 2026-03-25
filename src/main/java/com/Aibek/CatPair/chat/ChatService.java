@@ -40,16 +40,17 @@ public class ChatService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot start chat with yourself");
         }
 
-        return chatRepository.findByListingIdAndInitiatorId(listingId, currentUser.getId())
-                .map(ChatMapper::toResponse)
-                .orElseGet(() -> {
-                    Chat chat = new Chat();
-                    chat.setListing(listing);
-                    chat.setInitiator(currentUser);
-                    chat.setOwner(listing.getOwner());
-                    Chat saved = chatRepository.save(chat);
-                    return ChatMapper.toResponse(saved);
-                });
+        java.util.Optional<Chat> existing = chatRepository.findByListingIdAndInitiatorId(listingId, currentUser.getId());
+        if (existing.isPresent()) {
+            return ChatMapper.toResponse(existing.get());
+        }
+
+        Chat chat = new Chat();
+        chat.setListing(listing);
+        chat.setInitiator(currentUser);
+        chat.setOwner(listing.getOwner());
+        Chat saved = chatRepository.save(chat);
+        return ChatMapper.toResponse(saved);
     }
 
     @Transactional(readOnly = true)

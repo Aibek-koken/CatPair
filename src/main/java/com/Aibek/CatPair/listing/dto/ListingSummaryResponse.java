@@ -17,8 +17,12 @@ public class ListingSummaryResponse {
     private String cityName;
     private Integer age;
     private Gender gender;
+    private String description;
     private PriceType priceType;
     private BigDecimal priceValue;
+    private boolean hasDocs;
+    private boolean vaccinated;
+    private String ownerName;
     private ListingStatus status;
     private Instant createdAt;
     private List<String> photoUrls;
@@ -125,5 +129,37 @@ public class ListingSummaryResponse {
 
     public void setPhotoUrls(List<String> photoUrls) {
         this.photoUrls = photoUrls;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isHasDocs() {
+        return hasDocs;
+    }
+
+    public void setHasDocs(boolean hasDocs) {
+        this.hasDocs = hasDocs;
+    }
+
+    public boolean isVaccinated() {
+        return vaccinated;
+    }
+
+    public void setVaccinated(boolean vaccinated) {
+        this.vaccinated = vaccinated;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 }

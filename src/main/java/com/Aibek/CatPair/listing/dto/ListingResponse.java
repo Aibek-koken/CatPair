@@ -12,6 +12,8 @@ public class ListingResponse {
     private Long id;
     private Long ownerId;
     private String ownerName;
+    private String ownerAvatarUrl;
+    private Instant ownerCreatedAt;
     private String name;
     private Long breedId;
     private String breedName;
@@ -53,6 +55,22 @@ public class ListingResponse {
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public String getOwnerAvatarUrl() {
+        return ownerAvatarUrl;
+    }
+
+    public void setOwnerAvatarUrl(String ownerAvatarUrl) {
+        this.ownerAvatarUrl = ownerAvatarUrl;
+    }
+
+    public Instant getOwnerCreatedAt() {
+        return ownerCreatedAt;
+    }
+
+    public void setOwnerCreatedAt(Instant ownerCreatedAt) {
+        this.ownerCreatedAt = ownerCreatedAt;
     }
 
     public String getName() {

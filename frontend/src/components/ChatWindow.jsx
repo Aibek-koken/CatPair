@@ -40,12 +40,7 @@ export default function ChatWindow({ chat, messages, onSend }) {
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/15 text-xs font-bold text-accent">
             {partnerName[0]?.toUpperCase() ?? '?'}
           </div>
-          <div>
-            <h3 className="text-base font-semibold text-ink leading-tight">{partnerName}</h3>
-            <p className="text-[11px] text-muted leading-tight">
-              Объявление: {chat.listingName}
-            </p>
-          </div>
+          <h3 className="text-base font-semibold text-ink leading-tight">{partnerName}</h3>
         </div>
       </div>
 

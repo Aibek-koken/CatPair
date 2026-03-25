@@ -12,13 +12,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 
 @Entity
-@Table(name = "chats", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"listing_id", "initiator_id"})
-})
+@Table(name = "chats")
 public class Chat {
 
     @Id

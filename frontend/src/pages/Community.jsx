@@ -64,9 +64,9 @@ function HeartIcon({ filled }) {
 
 // ─── Comment sort options ─────────────────────────────────────────────────────
 const COMMENT_SORT_OPTIONS = [
-  { id: 'top', label: '🔥 Лучшие' },
-  { id: 'new', label: '🕐 Новые'  },
-  { id: 'old', label: '📜 Старые' },
+  { id: 'top', label: ' Лучшие' },
+  { id: 'new', label: ' Новые'  },
+  { id: 'old', label: ' Старые' },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────

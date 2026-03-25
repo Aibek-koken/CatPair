@@ -9,12 +9,12 @@ import { useAuthStore } from '../store/authStore';
 import { formatDate, formatPrice } from '../utils/format';
 import { getErrorMessage } from '../utils/error';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL ?? '';
 
 export default function ListingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuthStore();
+  const { token, user: currentUser } = useAuthStore();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentPhoto, setCurrentPhoto] = useState(0);
@@ -56,8 +56,15 @@ export default function ListingDetail() {
   const statusLabel = listing.status === 'ACTIVE' ? 'Активно' : 'Неактивно';
   const genderLabel = listing.gender === 'MALE' ? 'Самец' : listing.gender === 'FEMALE' ? 'Самка' : 'Не указан';
 
+  const isOwn = currentUser && listing.ownerId === currentUser.id;
+
+  const ownerAvatarUrl = listing.ownerAvatarUrl
+    ? (listing.ownerAvatarUrl.startsWith('http') ? listing.ownerAvatarUrl : `${API_URL}${listing.ownerAvatarUrl}`)
+    : null;
+
   return (
     <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      {/* Left column: photos + description */}
       <div className="space-y-4">
         <div className="rounded-3xl border border-border bg-white/80 p-6 shadow-soft">
           <div className="overflow-hidden rounded-2xl border border-border">
@@ -92,7 +99,9 @@ export default function ListingDetail() {
         </div>
       </div>
 
+      {/* Right column: info + seller + chat */}
       <div className="space-y-4">
+        {/* Pet details card */}
         <div className="rounded-3xl border border-border bg-white/80 p-6 shadow-soft">
           <div className="flex items-start justify-between">
             <div>
@@ -143,9 +152,43 @@ export default function ListingDetail() {
               <span className="font-semibold">{formatDate(listing.createdAt)}</span>
             </div>
           </div>
-          <Button className="mt-6 w-full" onClick={handleChat}>
-            Написать владельцу
-          </Button>
+        </div>
+
+        {/* Seller card */}
+        <div className="rounded-3xl border border-border bg-white/80 p-6 shadow-soft">
+          <h2 className="mb-4 text-lg font-semibold">Продавец</h2>
+          <div className="flex items-center gap-4">
+            {ownerAvatarUrl ? (
+              <img
+                src={ownerAvatarUrl}
+                alt={listing.ownerName}
+                className="h-14 w-14 shrink-0 rounded-full border border-border object-cover"
+              />
+            ) : (
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xl font-bold text-accent">
+                {listing.ownerName?.charAt(0)?.toUpperCase() || '?'}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-base font-semibold text-ink">{listing.ownerName || 'Без имени'}</p>
+              {listing.ownerCreatedAt && (
+                <p className="mt-0.5 text-xs text-muted">
+                  На платформе с {formatDate(listing.ownerCreatedAt)}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {!isOwn && (
+            <Button className="mt-5 w-full" onClick={handleChat}>
+              Написать продавцу
+            </Button>
+          )}
+          {isOwn && (
+            <p className="mt-5 rounded-2xl bg-accent/5 px-4 py-3 text-center text-sm text-accent">
+              Это ваше объявление
+            </p>
+          )}
         </div>
 
         <div className="rounded-3xl border border-border bg-white/80 p-6 text-sm text-muted shadow-soft">
