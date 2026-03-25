@@ -48,14 +48,21 @@ public class SecurityConfig {
                         .authenticationEntryPoint(unauthorizedEntryPoint())
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Разрешаем статику фронтенда и корень сайта
+                        .requestMatchers("/", "/index.html", "/*.js", "/*.css", "/assets/**", "/favicon.ico").permitAll()
+
+                        // 2. Публичные эндпоинты API
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/dictionaries/**", "/uploads/**").permitAll()
+
+                        // 3. Публичный просмотр объявлений и постов (GET запросы)
                         .requestMatchers(HttpMethod.GET,
                                 "/api/listings/**",
                                 "/api/posts/**",
                                 "/api/users/*/listings",
-                                "/api/users/*/posts")
-                        .permitAll()
+                                "/api/users/*/posts").permitAll()
+
+                        // 4. Всё остальное требует авторизации (ЛК, создание объявлений и т.д.)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -82,8 +89,8 @@ public class SecurityConfig {
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
-        source.registerCorsConfiguration("/uploads/**", config);
+        // Регистрируем для ВСЕХ путей, а не только /api/**
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 
