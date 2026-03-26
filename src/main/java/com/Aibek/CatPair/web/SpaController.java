@@ -4,17 +4,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * Serves the React SPA for direct URL hits (React Router). Static assets under
- * {@code /assets/**} are resolved first; API and {@code /uploads/**} use more specific mappings.
+ * Serves the React SPA for direct URL hits (React Router).
+ * <p>
+ * Uses only path patterns compatible with Spring {@code PathPatternParser} (no {@code **}
+ * in the middle of a pattern). Static files under {@code /assets/**} are not matched here.
  */
 @Controller
 public class SpaController {
 
     @GetMapping(value = {
             "/",
-            "/{path:[^\\.]*}",
+            "/login",
+            "/register",
+            "/community",
+            "/dashboard",
+            "/chats",
             "/listing/**",
-            "/**/{path:[^\\.]*}"
+            "/{path:[^\\.]*}"
     })
     public String forwardToIndex() {
         return "forward:/index.html";
