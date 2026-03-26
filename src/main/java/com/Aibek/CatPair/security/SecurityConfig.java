@@ -1,5 +1,6 @@
 package com.Aibek.CatPair.security;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,21 +49,31 @@ public class SecurityConfig {
                         .authenticationEntryPoint(unauthorizedEntryPoint())
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Разрешаем статику фронтенда и корень сайта
-                        .requestMatchers("/", "/index.html", "/*.js", "/*.css", "/assets/**", "/favicon.ico").permitAll()
-
-                        // 2. Публичные эндпоинты API
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Публичные API (все методы, где нужно)
                         .requestMatchers("/api/auth/**", "/api/dictionaries/**", "/uploads/**").permitAll()
 
-                        // 3. Публичный просмотр объявлений и постов (GET запросы)
+                        // Публичные GET API
                         .requestMatchers(HttpMethod.GET,
                                 "/api/listings/**",
                                 "/api/posts/**",
                                 "/api/users/*/listings",
                                 "/api/users/*/posts").permitAll()
 
-                        // 4. Всё остальное требует авторизации (ЛК, создание объявлений и т.д.)
+                        // Статика Vite/React в classpath (GET)
+                        .requestMatchers(HttpMethod.GET,
+                                "/",
+                                "/index.html",
+                                "/*.js",
+                                "/*.css",
+                                "/assets/**",
+                                "/favicon.ico").permitAll()
+
+                        // Любой GET вне /api/** — HTML/SPA и прочие не-API GET
+                        .requestMatchers(SecurityConfig::isNonApiGet).permitAll()
+
+                        // Остальное — защищённые API (POST/PUT/PATCH/DELETE и приватные GET вроде /api/users/me)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -99,6 +110,10 @@ public class SecurityConfig {
                 .map(String::trim)
                 .filter(value -> !value.isEmpty())
                 .toList();
+    }
+
+    private static boolean isNonApiGet(HttpServletRequest request) {
+        return HttpMethod.GET.matches(request.getMethod()) && !request.getRequestURI().startsWith("/api/");
     }
 
     @Bean
