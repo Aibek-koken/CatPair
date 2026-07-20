@@ -4,8 +4,6 @@ A full-stack cat adoption and rehoming platform. Owners publish listings for
 cats that need a home; adopters browse and filter them, then reach the owner
 through built-in real-time chat. A community feed lets users share posts.
 
-Live demo: https://cat-pair.vercel.app
-
 ## Features
 
 - **Listings** — create cat listings with multiple photos, breed, city, gender,
