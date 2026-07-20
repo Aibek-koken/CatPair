@@ -1,2 +1,10 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# Repo language badge: business logic, security and the DB schema live in
+# the Spring Boot backend (Java). frontend/ is a React/JS UI on top of it,
+# but is larger by raw byte count, which makes GitHub misreport JavaScript
+# as the primary language. This does not affect builds - it only overrides
+# GitHub's language stats/badge and that directory's displayed syntax
+# highlighting.
+frontend/** linguist-language=Java
